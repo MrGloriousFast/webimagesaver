@@ -9,6 +9,7 @@ websites['karo5']        = 'https://webcam.hrz.tu-darmstadt.de/TU-Darmstadt-karo
 websites['darmstadtium'] = 'https://webcam.hrz.tu-darmstadt.de/Schloss-view-WKZ/current.jpg'
 websites['cafe']         = 'https://webcam.hrz.tu-darmstadt.de/Neubau-603qm/current.jpg'
 websites['flugfeld']     = 'https://webcam.hrz.tu-darmstadt.de/Tower/current.jpg'
+# websites['test error']     = 'invalid website (*&^%$#'
 
 # do this for every image we want to save
 for site in websites:
@@ -21,19 +22,24 @@ for site in websites:
     name_folder = 'images/'+site+'/'+str(datetime.datetime.today().strftime('%Y-%m-%d'))
     
     # name of one image
-    name_image = str(datetime.datetime.today().strftime('%Y-%m-%d_%H-%M'))+'.jpg'
+    name_image = str(datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S'))+'.jpg'
 
     #complete path consists of folder and image
     complete_path = name_folder+'/'+name_image
 
-    # create a folder if needed
-    if not os.path.exists(name_folder):
-        os.makedirs(name_folder)
-
-    # actually try to get the image
+    
     try:
+        # create a folder if needed
+        if not os.path.exists(name_folder):
+            os.makedirs(name_folder)
+        
+        # actually try to get the image
         img = urllib.request.urlretrieve(websites[site], complete_path)
-    except:
-        # if it fails it will not do anything at all. the image will just miss
-        # i could write it into a log file but when the power goes out or anything at all the logfile will not be complete, so better not to write anything at all
-        pass
+        
+    except Exception as err:
+        # if it fails it will not do anything at all but write the error into a logfile
+        log_file = open('log.txt', 'a')
+        log_entry = complete_path + '\n\t' + str(err) + '\n'
+        log_file.write(log_entry)
+        log_file.close()
+        
